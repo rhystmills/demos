@@ -102,59 +102,122 @@ drawRainbowCanvas();
 
 function getRainbowHue(num){}
 
-let slider = document.getElementById("slider");
-let viewportOffset = slider.getBoundingClientRect();
+const currentColour = document.getElementById("currentColour");
 
-let channel = document.getElementById("channel");
-let sliderOrigin = channel.getBoundingClientRect().top;
+const slider = document.getElementById("slider");
+const sliderBox = slider.getBoundingClientRect();
+
+const channel = document.getElementById("channel");
+const channelTop = channel.getBoundingClientRect().top;
+
+const pickerBox = pickerCanvas.getBoundingClientRect();
+
+const pointer = document.getElementById("pointer");
+let pointerBox = pointer.getBoundingClientRect();
 
 let sliderActive = false;
+let pickerActive = false;
+
 slider.addEventListener('mousedown',() => {
     sliderActive = true; 
-    // console.log(sliderActive); 
-    viewportOffset = slider.getBoundingClientRect(); 
-    sliderOrigin = channel.getBoundingClientRect().top;
-})
-// slider.addEventListener('mouseup',() => {sliderActive = false; console.log(sliderActive)})
-window.addEventListener('mouseup',() => {
-    viewportOffset = slider.getBoundingClientRect(); 
-    sliderOrigin = channel.getBoundingClientRect().top;
-    sliderActive = false; 
-    // console.log(sliderActive)
 })
 
+channel.addEventListener('mousedown',() => {
+    sliderActive = true; 
+})
+
+window.addEventListener('mouseup',() => {
+    sliderActive = false; 
+    pickerActive = false;
+})
+
+pickerCanvas.addEventListener('mousedown',() => {
+    pickerActive = true; 
+    
+})
+
+pointer.addEventListener('mousedown',() => {
+    pickerActive = true;  
+})
+
+function pickerPosition(pos, boundary, modifier){
+    if (pos >= (0 - modifier) && pos < (boundary - modifier))return pos
+    else if (pos < 0 - modifier) return 0 - modifier;
+    else return boundary - modifier
+}
+
+function valRange(val, max, min){
+   if (val > max) return max
+   if (val < min) return min
+   return val
+}
+
 function findDocumentCoords(mouseEvent){
-    let yPos;
+    let yPosSlider;
+    let xPosPicker;
+    let yPosPicker;
+    
 
     if (mouseEvent){
         xpos = mouseEvent.pageX;
-        yPos = mouseEvent.pageY - sliderOrigin - 4;
+        yPosSlider = mouseEvent.pageY - channelTop - sliderBox.height/2;
+        xPosPicker = mouseEvent.pageX - pickerBox.left - pointerBox.width/2;
+        yPosPicker = mouseEvent.pageY - pickerBox.top - pointerBox.height/2;
     } else {
         //IE
         xpos = window.event.x + document.body.scrollLeft - 2;
-        yPos = window.event.y + document.body.scrollTop - viewportOffset;
+        yPosSlider = window.event.y + document.body.scrollTop - sliderBox;
     }
 
     if (sliderActive){
-        if (yPos > 0) { 
-            let y = yPos;
+        let pixel = pickerCtx.getImageData(
+            valRange(pointerBox.left - pickerBox.left + pointerBox.width/2, pickerBox.width-1, 0), 
+            valRange(pointerBox.top - pickerBox.left + pointerBox.height/2, pickerBox.height-1, 0), 
+            1, 
+            1
+        );
+        let [pixR, pixG, pixB, pixA] = pixel.data;
+        currentColour.setAttribute("style",`background-color: rgb(${pixR},${pixG},${pixB})`)
+        if (yPosSlider > -7) { 
+            let y = yPosSlider + 6;
             let r = Math.floor(red(y*6/256)*255)
             let g = Math.floor(green(y*6/256)*255)
             let b = Math.floor(blue(y*6/256)*255)
             let hexColor = '#' + hexTwoDigits(r) + hexTwoDigits(g) + hexTwoDigits(b)
-            slider.setAttribute("style",`top: ${yPos}px;`);
-            slider.setAttribute("fill",`${hexColor}`);
-            changeZAndDraw((yPos/256 * 6))
-
-            if (yPos > 256 - slider.getBoundingClientRect().height) {
-                slider.setAttribute("style",`top: ${256-15}px;`);
-                slider.setAttribute("fill",`#ff0000`);
+            if (yPosSlider <= 266){
+                slider.setAttribute("style",`top: ${yPosSlider-1}px;`);
+                slider.setAttribute("fill",`${hexColor}`);
+                changeZAndDraw((yPosSlider/256 * 6))
             }
+
+            if (yPosSlider > 267 - slider.getBoundingClientRect().height) {
+                slider.setAttribute("style",`top: ${266-15-2}px;`);
+                slider.setAttribute("fill",`#ff0000`);
+                changeZAndDraw((256/256 * 6))
+            }
+            
         }
-        if (yPos < 0) {
-            slider.setAttribute("style",`top: ${0}px;`)
+        if (yPosSlider <= -7) {
+            slider.setAttribute("style",`top: ${-7}px;`);
             slider.setAttribute("fill",`#ff0000`);
+            changeZAndDraw((256/256 * 6))
         }
+    }
+
+    if (pickerActive){
+        //TODO: Colour based on pointer position, not mouse position
+        pointerBox = pointer.getBoundingClientRect();
+        pointerY = pickerPosition(yPosPicker, pickerBox.height, (pointerBox.height/2));
+        pointerX = pickerPosition(xPosPicker, pickerBox.width, (pointerBox.width/2));
+        pointer.setAttribute("style", `top: ${pointerY}px; left: ${pointerX}px`)
+        let pixel = pickerCtx.getImageData(
+            valRange(pointerBox.left - pickerBox.left + pointerBox.width/2, pickerBox.width-1, 0), 
+            valRange(pointerBox.top - pickerBox.left + pointerBox.height/2, pickerBox.height-1, 0), 
+            1, 
+            1
+        );
+        let [pixR, pixG, pixB, pixA] = pixel.data;
+        currentColour.setAttribute("style",`background-color: rgb(${pixR},${pixG},${pixB})`)
     }
 }
 
