@@ -1,16 +1,8 @@
-// const canvas = document.getElementById('canvas');
-// const ctx = canvas.getContext('2d');
+const pickerCanvas = document.getElementById("pickerCanvas");
+const pickerCtx = pickerCanvas.getContext("2d");
 
-// for (let x = 0; x < 256; x++){
-//     for (let y = 0; y < 256; y++){
-//         let hexColor = '#' + Number(x).toString(16).padStart(2, '0') + Number(y).toString(16).padStart(2, '0') + '00'
-//         ctx.fillStyle = hexColor;
-//         ctx.fillRect(x, y, 1, 1);
-//     }
-// }
-
-const pickerCanvas = document.getElementById('pickerCanvas');
-const pickerCtx = pickerCanvas.getContext('2d');
+const hexText = document.getElementById("hexText");
+const rgbText = document.getElementById("rgbText")
 
 //Sliding scale:
 // r = 0 - 1, 2 - 3 
@@ -40,19 +32,19 @@ function blue(z){
 }
 
 const grey = (x,y) => Math.floor(x * y / 255) 
-
-const hexTwoDigits = (num) => Number(num).toString(16).padStart(2, '0')
+const hexTwoDigits = (num) => Number(num).toString(16).padStart(2, "0")
 
 function drawCanvas(){
-
     let newImage = pickerCtx.createImageData(256, 256);
     var pixels = newImage.data;
+
     for (let x = 0; x < 256; x++){
-        
         for (let y = 0; y < 256; y++){
-            let r = Math.floor((red(z) * y) + ((1 - red(z)) * grey(x,y)));
-            let g = Math.floor((green(z) * y) + ((1 - green(z)) * grey(x,y)));
-            let b = Math.floor((blue(z) * y) + ((1 - blue(z)) * grey(x,y)));
+            let y2 = 255 - y;
+            let x2 = 255 - x;
+            let r = Math.floor((red(z) * y2) + ((1 - red(z)) * grey(x2,y2)));
+            let g = Math.floor((green(z) * y2) + ((1 - green(z)) * grey(x2,y2)));
+            let b = Math.floor((blue(z) * y2) + ((1 - blue(z)) * grey(x2,y2)));
             var off = (y * newImage.width + x) * 4;
             pixels[off] = r;
             pixels[off + 1] = g;
@@ -62,18 +54,6 @@ function drawCanvas(){
     }
 
     pickerCtx.putImageData(newImage, 0, 0);
-    // for (let x = 0; x < 256; x++){
-    //     for (let y = 0; y < 256; y++){
-    //         let r = Math.floor((red(z) * y) + ((1 - red(z)) * grey(x,y)));
-    //         let g = Math.floor((green(z) * y) + ((1 - green(z)) * grey(x,y)));
-    //         let b = Math.floor((blue(z) * y) + ((1 - blue(z)) * grey(x,y)));
-    //         // if (x==0 && y == 0) console.log(r, g, b);
-    //         let hexColor = '#' + hexTwoDigits(r) + hexTwoDigits(g) + hexTwoDigits(b)
-    //         pickerCtx.fillStyle = hexColor;
-    //         pickerCtx.fillRect(x, y, 1, 1);
-    //     }
-    // }
-    //do critical time stuff
 }
 
 function changeZAndDraw(input){
@@ -81,20 +61,37 @@ function changeZAndDraw(input){
     drawCanvas();
 }
 
+function setColorToPicker(){
+    pointerBox = pointer.getBoundingClientRect();
+    canvasBox = pickerCanvas.getBoundingClientRect();
+    let pixel = pickerCtx.getImageData(
+        valRange(pointerBox.left - canvasBox.left + pointerBox.width/2, canvasBox.width-1, 0), 
+        valRange(pointerBox.top - canvasBox.left + pointerBox.height/2, canvasBox.height-1, 0), 
+        1, 
+        1
+    );
+    console.log(pixel.data)
+    let [pixR, pixG, pixB, pixA] = pixel.data;
+    currentColour.setAttribute("style",`background-color: rgb(${pixR},${pixG},${pixB})`)
+    //Update text fields
+    hexText.textContent = `#${hexTwoDigits(pixR)}${hexTwoDigits(pixG)}${hexTwoDigits(pixB)}`;
+    rgbText.textContent = `${pixR}, ${pixG}, ${pixB}`
+}
+
 drawCanvas();
 
 
 const rainbowBar = document.getElementById("rainbowBar")
-const rainbowCtx = rainbowBar.getContext('2d');
+const rainbowCtx = rainbowBar.getContext("2d");
 
 function drawRainbowCanvas(){
     for (let y = 0; y < 256; y++){
-        let r = Math.floor(red(y*6/256)*255)
-        let g = Math.floor(green(y*6/256)*255)
-        let b = Math.floor(blue(y*6/256)*255)
-        let hexColor = '#' + hexTwoDigits(r) + hexTwoDigits(g) + hexTwoDigits(b)
+        let r = Math.floor(red(y*6/255)*255)
+        let g = Math.floor(green(y*6/255)*255)
+        let b = Math.floor(blue(y*6/255)*255)
+        let hexColor = "#" + hexTwoDigits(r) + hexTwoDigits(g) + hexTwoDigits(b)
         rainbowCtx.fillStyle = hexColor;
-        rainbowCtx.fillRect(0, y, 15, 1);
+        rainbowCtx.fillRect(0, y, 16, 1);
     }
 }
 
@@ -103,40 +100,32 @@ drawRainbowCanvas();
 function getRainbowHue(num){}
 
 const currentColour = document.getElementById("currentColour");
-
 const slider = document.getElementById("slider");
-const sliderBox = slider.getBoundingClientRect();
-
-const channel = document.getElementById("channel");
-const channelTop = channel.getBoundingClientRect().top;
-
-const pickerBox = pickerCanvas.getBoundingClientRect();
-
 const pointer = document.getElementById("pointer");
+const channel = document.getElementById("channel");
+
+const channelBox = channel.getBoundingClientRect();
+const sliderBox = slider.getBoundingClientRect();
+let canvasBox = pickerCanvas.getBoundingClientRect();
 let pointerBox = pointer.getBoundingClientRect();
 
 let sliderActive = false;
 let pickerActive = false;
 
-slider.addEventListener('mousedown',() => {
-    sliderActive = true; 
-})
+slider.addEventListener("mousedown",() => { sliderActive = true; })
+channel.addEventListener("mousedown",() => { sliderActive = true; })
 
-channel.addEventListener('mousedown',() => {
-    sliderActive = true; 
-})
-
-window.addEventListener('mouseup',() => {
+window.addEventListener("mouseup",() => {
     sliderActive = false; 
     pickerActive = false;
 })
 
-pickerCanvas.addEventListener('mousedown',() => {
+pickerCanvas.addEventListener("mousedown",() => {
     pickerActive = true; 
     
 })
 
-pointer.addEventListener('mousedown',() => {
+pointer.addEventListener("mousedown",() => {
     pickerActive = true;  
 })
 
@@ -160,19 +149,21 @@ function findDocumentCoords(mouseEvent){
 
     if (mouseEvent){
         xpos = mouseEvent.pageX;
-        yPosSlider = mouseEvent.pageY - channelTop - sliderBox.height/2;
-        xPosPicker = mouseEvent.pageX - pickerBox.left - pointerBox.width/2;
-        yPosPicker = mouseEvent.pageY - pickerBox.top - pointerBox.height/2;
+        yPosSlider = mouseEvent.pageY - channelBox.top - sliderBox.height/2;
+        xPosPicker = mouseEvent.pageX - canvasBox.left - pointerBox.width/2;
+        yPosPicker = mouseEvent.pageY - canvasBox.top - pointerBox.height/2;
     } else {
         //IE
-        xpos = window.event.x + document.body.scrollLeft - 2;
-        yPosSlider = window.event.y + document.body.scrollTop - sliderBox;
+        xpos = window.event.x + document.body.scrollLeft - pointerBox.width/2;
+        yPosSlider = window.event.y + document.body.scrollTop - pointerBox.height/2;
     }
 
     if (sliderActive){
+        pointerBox = pointer.getBoundingClientRect();
+        canvasBox = pickerCanvas.getBoundingClientRect();
         let pixel = pickerCtx.getImageData(
-            valRange(pointerBox.left - pickerBox.left + pointerBox.width/2, pickerBox.width-1, 0), 
-            valRange(pointerBox.top - pickerBox.left + pointerBox.height/2, pickerBox.height-1, 0), 
+            valRange(pointerBox.left - canvasBox.left + pointerBox.width/2, canvasBox.width-1, 0), 
+            valRange(pointerBox.top - canvasBox.left + pointerBox.height/2, canvasBox.height-1, 0), 
             1, 
             1
         );
@@ -183,11 +174,12 @@ function findDocumentCoords(mouseEvent){
             let r = Math.floor(red(y*6/256)*255)
             let g = Math.floor(green(y*6/256)*255)
             let b = Math.floor(blue(y*6/256)*255)
-            let hexColor = '#' + hexTwoDigits(r) + hexTwoDigits(g) + hexTwoDigits(b)
+            let hexColor = "#" + hexTwoDigits(r) + hexTwoDigits(g) + hexTwoDigits(b)
             if (yPosSlider <= 266){
                 slider.setAttribute("style",`top: ${yPosSlider-1}px;`);
                 slider.setAttribute("fill",`${hexColor}`);
                 changeZAndDraw((yPosSlider/256 * 6))
+                setColorToPicker();
             }
 
             if (yPosSlider > 267 - slider.getBoundingClientRect().height) {
@@ -207,18 +199,13 @@ function findDocumentCoords(mouseEvent){
     if (pickerActive){
         //TODO: Colour based on pointer position, not mouse position
         pointerBox = pointer.getBoundingClientRect();
-        pointerY = pickerPosition(yPosPicker, pickerBox.height, (pointerBox.height/2));
-        pointerX = pickerPosition(xPosPicker, pickerBox.width, (pointerBox.width/2));
-        pointer.setAttribute("style", `top: ${pointerY}px; left: ${pointerX}px`)
-        let pixel = pickerCtx.getImageData(
-            valRange(pointerBox.left - pickerBox.left + pointerBox.width/2, pickerBox.width-1, 0), 
-            valRange(pointerBox.top - pickerBox.left + pointerBox.height/2, pickerBox.height-1, 0), 
-            1, 
-            1
-        );
-        let [pixR, pixG, pixB, pixA] = pixel.data;
-        currentColour.setAttribute("style",`background-color: rgb(${pixR},${pixG},${pixB})`)
+        pointerY = pickerPosition(yPosPicker, canvasBox.height-1, (pointerBox.height/2));
+        pointerX = pickerPosition(xPosPicker, canvasBox.width-1, (pointerBox.width/2));
+        pointer.setAttribute("style", `top: ${pointerY}px; left: ${pointerX}px`);
+        setColorToPicker();
     }
 }
 
 window.onmousemove = findDocumentCoords;
+window.onmousedown = findDocumentCoords;
+setColorToPicker();
