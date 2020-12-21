@@ -1,0 +1,37 @@
+.mv-slider {
+    width: 400px;
+    height: 15px;
+    outline: 1px solid black;
+    position: relative;
+    display: flex;
+    cursor: pointer;
+}
+.mv-slider-switch {
+    width: 15px;
+    height: 15px;
+    background-color: black;
+    position: relative;
+    left: 0px;
+    display: inline-block;
+    cursor: pointer;
+}
+.mv-slider-switch:active {
+    cursor: grabbing;
+}
+.mv-slider:active {
+    cursor: grabbing;
+}
+.playerButton {
+    outline: 1px solid black;
+    background-color: white;
+    width: 15px;
+    height: 15px;
+    margin-right: 5px;
+    cursor: pointer;
+}
+.playerButton:hover {
+    background-color: #ddd;
+}
+.playerButton:active {
+    background-color: #bbffff;
+}

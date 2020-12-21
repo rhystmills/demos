@@ -1,0 +1,19 @@
+{
+  "name": "jsfeatures",
+  "version": "1.0.0",
+  "description": "Testing JS language features",
+  "main": "main.js",
+  "scripts": {
+    "test": "jest",
+    "build": "tsc -p .",
+    "start": "npx ts-node src/index.ts"
+  },
+  "author": "Rhys Mills",
+  "license": "ISC",
+  "dependencies": {
+    "node": "^15.0.1"
+  },
+  "devDependencies": {
+    "typescript": "^4.0.5"
+  }
+}

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="styles.css">
+    <meta charset="utf-8">
+    <title>boilerplace</title>
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+    <script nomodule src="https://unpkg.com/@google/model-viewer/dist/model-viewer-legacy.js"></script>
+</head>
+
+<body id="body">
+    <!-- Code starts -->
+    <div style="height: 500px; width: 500px;">
+        <model-viewer 
+            id="mv-model"
+            src="./hugh-mans-4.glb"
+            alt="A 3D model of an thing Jon sent me" 
+            style="width: 500px; height: 500px; top: 0px; position: sticky"
+            camera-controls
+            autoplay
+            >
+        </model-viewer>
+    </div>
+    <div style="display: flex; margin-top: 5px;">
+        <div class="playerButton">
+            <svg fill="#000000" id="play" viewBox="-0.3 -0.3 2.6 2.6" xmlns="http://www.w3.org/2000/svg" baseProfile="full" version="1.1">
+                <path d="M 0 0 L 2 1 L 0 2 Z" />
+            </svg>
+        </div>
+        <div class="playerButton">
+            <svg fill="#000000" id="pause" viewBox="-0.4 -0.4 3.8 3.8" xmlns="http://www.w3.org/2000/svg" baseProfile="full" version="1.1">
+                <path d="M 0 0 L 1 0 L 1 3 L 0 3 Z" />
+                <path d="M 2 0 L 3 0 L 3 3 L 2 3 Z" />
+            </svg>
+        </div>
+        <div class="mv-slider" id="mv-slider">
+            <div class="mv-slider-switch" id="mv-slider-switch"></div>
+        </div>
+    </div>
+    <!-- Code ends -->
+    <script src="script.js"></script>
+</body>
+</html>

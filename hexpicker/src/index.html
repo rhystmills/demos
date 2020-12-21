@@ -1,0 +1,265 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400&display=swap" rel="stylesheet">
+    <style>
+    /* Global Styles */
+
+    * {
+        font-family: "Noto Sans", "Segoe UI", Tahoma, Verdana, sans-serif;
+        color: #aaa;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        font-size: 100%;
+        font: inherit;
+        vertical-align: baseline;
+    }
+    p, span {
+        font-family: "Noto Sans", Arial, "Segoe UI", Tahoma, Verdana, sans-serif;
+        font-size: 14px;
+    }
+    p {
+        line-height: 10px;
+    }
+
+    /* Specific IDs */
+    #slider {
+        position: absolute; 
+        top: -7px; 
+        height: 18px; 
+        width: 24px;
+        margin-left: 4px;
+        left: 0px;
+        filter: drop-shadow(1px 1px 3px rgba(0,0,0,0.4))
+    }
+    #pointer {
+        position: absolute;
+        left: 242.5px;
+        width: 5px;
+        height: 5px;
+        border: 4px solid black;
+        border-radius: 50%;
+    }
+    #subPointer {
+        position: absolute;
+        left: -2px;
+        top: -2px;
+        width: 5px;
+        height: 5px;
+        border: 2px solid white;
+        border-radius: 50%;
+    }
+    #currentColour {
+        box-sizing: border-box;
+        height: 36px;
+        width: 36px;
+        margin-left: 5px;
+        margin-right: 15px;
+        display: inline-block;
+        border: #fff solid 1px;
+        border-radius: 4px;
+        align-self: center;
+    }
+    #mainWrapper {
+        background-color: #000;
+        width: 272px;
+    }
+    
+
+    /* Specific Classes */
+
+    .colourOptionsPanel {
+        width: 80px;
+    }
+    .colourType {
+        display: inline-block;
+        width: 40px;
+        text-align: end;
+    }
+    .uiRow {
+        padding: 16px 16px;
+        height: 54px;
+    }
+    .uiRow:first-of-type {
+        padding-bottom: 12px;
+    }
+    .uiRow:last-of-type {
+        padding-top: 0px;
+        border-top: solid #434343 1px;
+    }
+    .textField {
+        box-sizing: border-box;
+        width: 112px;
+        height: 24px;
+        border: #434343 solid 1px;
+        border-radius: 12px;
+        padding-left: 8px;
+        padding-top: 1px;
+    }
+    .colourValueRow {
+        display: block;
+    }
+    .colourValueRow:first-child {
+        display: block;
+        margin-bottom: 6px;
+    }
+    .iconButton {
+        box-sizing: border-box;
+        width: 24px;
+        height: 24px;
+        border: #434343 solid 1px;
+        border-radius: 4px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .iconButton:hover {
+        background-color: #434343;
+        border-color: #aaa;
+        cursor: pointer;
+    }
+    .iconButton svg {
+        stroke: #aaa;
+    }
+    .iconButton:hover svg {
+        stroke: #fff;
+    }
+    .smallBox {
+        display: inline-block;
+        box-sizing: border-box;
+        width: 16px;
+        height: 16px;
+        border: #434343 solid 1px;
+        border-radius: 4px;
+        margin-top: 8px;
+        margin-left: 8px;
+    }
+    .smallBox:hover {
+        border-color: #aaa;
+        cursor: pointer;
+        stroke: #fff;
+    }
+    .paletteColours {
+        width: 155px;
+        display: flex;
+        flex-direction: column;
+    }
+    .buttonRow {
+        box-sizing: border-box;
+        padding: 0px;
+        height: 24px;
+        margin-top: 8px;
+    }
+    .buttonColumn > div:last-child {
+        margin-top: 4px;
+    }
+
+    /* Generic Classes */
+
+    .block {
+        display: block;
+    }
+    .inlineBlock {
+        display: inline-block;
+    }
+    .flex {
+        display: flex;
+    }
+    .row {
+        flex-direction: row;
+    }
+    .column {
+        flex-direction: column;
+    }
+    .tight {
+        letter-spacing: -0.5px;
+    }
+    .end {
+        align-self: flex-end;
+    }
+    </style>
+    <meta charset="utf-8">
+    <title>hexpicker</title>
+</head>
+
+<body id="body">
+    <main id="mainWrapper">
+        <div class="flex row">
+            <div id="canvasContainer" style="display: inline-flex; position: relative; height: 256px;">
+                <div id="pointer"><div id="subPointer"></div></div>
+                <canvas id="pickerCanvas" height="256px" width="256px" ></canvas> 
+            </div>
+            <div id="channel" style="display: inline-flex; position: relative; background-color: #ddd; padding: 0px; margin: 0px; box-sizing: content-block; height: 256px;">
+                <canvas id="rainbowBar" style="display: inline-block;" height="256px" width="16px" ></canvas>
+                <svg fill="#ff0000" id="slider" viewBox="-0.2 -0.2 3.2 3.2" xmlns="http://www.w3.org/2000/svg" baseProfile="full" version="1.1">
+                    <path stroke="white" stroke-width="0.3" stroke-linecap="round" d="M 1 0 L 3 0 L 3 2 L 1 2 L 0 1 Z" />
+                </svg>
+            </div>
+        </div>
+        <div class="uiRow flex">
+            <div class="colourOptionsPanel flex row">
+                <div id="currentColour"></div>
+                <div class="buttonColumn">
+                    <div class="iconButton" id="saveButton" onclick="saveColor()">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14 15H2C1.44772 15 1 14.5523 1 14V2C1 1.44772 1.44771 1 2 1H11.8046C12.0586 1 12.3031 1.0967 12.4885 1.27046L13.6 2.3125L14.6839 3.32869C14.8856 3.51774 15 3.78182 15 4.05823V14C15 14.5523 14.5523 15 14 15Z" />
+                            <path d="M4.73333 1V4.73333H11.2667V1" />
+                            <path d="M2.86667 15V7.53333H13.1333V15" />
+                        </svg>                            
+                    </div>
+                    <div class="iconButton">
+                        <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="13.7916" y="5.65685" width="9" height="3" rx="0.5" transform="rotate(45 13.7916 5.65685)" />
+                            <path d="M21.9234 7.42462L18.7414 10.6066L15.2058 7.07107L18.3878 3.88909C19.3641 2.91278 20.9471 2.91278 21.9234 3.88909C22.8997 4.8654 22.8997 6.44831 21.9234 7.42462Z" />
+                            <path d="M8.58906 13.6879L13.0845 9.19239L16.6201 12.7279L12.1246 17.2234C12.0558 17.2922 11.9773 17.3506 11.8916 17.3968L7.55385 19.7325C7.46816 19.7786 7.38966 19.837 7.32084 19.9058L6.47871 20.748C6.40271 20.824 6.31495 20.8872 6.21882 20.9353C5.35926 21.3651 4.4474 20.4532 4.87717 19.5936C4.92524 19.4975 4.98849 19.4097 5.06449 19.3337L5.90663 18.4916C5.97544 18.4228 6.03385 18.3443 6.07999 18.2586L8.4157 13.9209C8.46184 13.8352 8.52024 13.7567 8.58906 13.6879Z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="inline colourCaptions">
+                <span class="colourValueRow">
+                    <span class="colourType">Hex:</span> 
+                    <span id="hexText" class="textField inlineBlock"></span>
+                </span>
+                <span class="colourValueRow">
+                    <span class="colourType tight">RGB:</span>
+                    <span id="rgbText" class="textField inlineBlock"></span>
+                </span>
+            </div>
+            
+        </div>
+        <div class="uiRow flex">
+            <div class="colourOptionsPanel flex column end">
+            <p>Palette:</p>
+                <div class="row buttonRow">
+                    <div class="iconButton inlineBlock"></div>
+                    <div class="iconButton inlineBlock"></div>
+                    <div class="iconButton inlineBlock"></div>
+                    
+                </div>
+            </div>
+            <div class="paletteColours end">
+                <div class="flex row end" id="boxRow0">
+                    <div class="smallBox"></div>
+                    <div class="smallBox"></div>
+                    <div class="smallBox"></div>
+                    <div class="smallBox"></div>
+                    <div class="smallBox"></div>
+                    <div class="smallBox"></div>
+                </div>
+                <div class="flex row end" id="boxRow1">
+                    <div class="smallBox"></div>
+                    <div class="smallBox"></div>
+                    <div class="smallBox"></div>
+                    <div class="smallBox"></div>
+                    <div class="smallBox"></div>
+                    <div class="smallBox"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
