@@ -1,8 +1,14 @@
+import './main.css';
+
 const pickerCanvas = document.getElementById("pickerCanvas");
 const pickerCtx = pickerCanvas.getContext("2d");
 
 const hexText = document.getElementById("hexText");
-const rgbText = document.getElementById("rgbText")
+const rgbText = document.getElementById("rgbText");
+
+let values = {
+    activeColor: undefined,
+}
 
 const elementWithId = (id) => document.getElementById(id);
 
@@ -71,8 +77,13 @@ function changeZAndDraw(input){
     drawCanvas();
 }
 
-function setColorToPicker(){
+function setColorToPicker(color){
     let [pixR, pixG, pixB, pixA] = getColor();
+    if (color) {
+        pixR = color.r;
+        pixG = color.g;
+        pixB = color.b;
+    };
     currentColour.setAttribute("style",`background-color: rgb(${pixR},${pixG},${pixB})`)
     //Update text fields
     hexText.textContent = `#${hexTwoDigits(pixR)}${hexTwoDigits(pixG)}${hexTwoDigits(pixB)}`;
@@ -110,17 +121,30 @@ const currentColour = document.getElementById("currentColour");
 const slider = document.getElementById("slider");
 const pointer = document.getElementById("pointer");
 const channel = document.getElementById("channel");
+const deleteColour = document.getElementById("deleteColour");
+
 
 const channelBox = channel.getBoundingClientRect();
 const sliderBox = slider.getBoundingClientRect();
+
 let canvasBox = pickerCanvas.getBoundingClientRect();
 let pointerBox = pointer.getBoundingClientRect();
+const pointerHeight = 8; // Math.round(pointerBox.height / 2);
+const sliderHeight = 8;
 
 let sliderActive = false;
 let pickerActive = false;
 
-slider.addEventListener("mousedown",() => { sliderActive = true; })
-channel.addEventListener("mousedown",() => { sliderActive = true; })
+
+slider.addEventListener("mousedown",() => { 
+    sliderActive = true; 
+})
+channel.addEventListener("mousedown",() => {
+    sliderActive = true; 
+})
+
+//Buttons
+document.getElementById('saveColor').addEventListener("click", saveColor)
 
 window.addEventListener("mouseup",() => {
     sliderActive = false; 
@@ -134,6 +158,14 @@ pickerCanvas.addEventListener("mousedown",() => {
 
 pointer.addEventListener("mousedown",() => {
     pickerActive = true;  
+})
+
+deleteColour.addEventListener("mousedown",(e) => {
+    if(typeof values.activeColor === "number"){
+        palette.splice(values.activeColor, 1)
+        savePalette();
+        drawPalette();
+    }
 })
 
 function pickerPosition(pos, boundary, modifier){
@@ -155,13 +187,14 @@ function findDocumentCoords(mouseEvent){
     
 
     if (mouseEvent){
-        xpos = mouseEvent.pageX;
-        yPosSlider = mouseEvent.pageY - channelBox.top - sliderBox.height/2;
-        xPosPicker = mouseEvent.pageX - canvasBox.left - pointerBox.width/2;
-        yPosPicker = mouseEvent.pageY - canvasBox.top - pointerBox.height/2;
+        // let xpos = mouseEvent.pageX;
+
+        yPosSlider = mouseEvent.pageY - sliderHeight; // - channelBox.top - sliderBox.height/2;
+        xPosPicker = mouseEvent.pageX - pointerHeight;
+        yPosPicker = mouseEvent.pageY - pointerHeight;
     } else {
         //IE
-        xpos = window.event.x + document.body.scrollLeft - pointerBox.width/2;
+        // let xpos = window.event.x + document.body.scrollLeft - pointerBox.width/2;
         yPosSlider = window.event.y + document.body.scrollTop - pointerBox.height/2;
     }
 
@@ -176,6 +209,7 @@ function findDocumentCoords(mouseEvent){
         );
         let [pixR, pixG, pixB, pixA] = pixel.data;
         currentColour.setAttribute("style",`background-color: rgb(${pixR},${pixG},${pixB})`)
+        console.log(yPosSlider)
         if (yPosSlider > -7) { 
             let y = yPosSlider + 6;
             let r = Math.floor(red(y*6/256)*255)
@@ -206,8 +240,8 @@ function findDocumentCoords(mouseEvent){
     if (pickerActive){
         //TODO: Colour based on pointer position, not mouse position
         pointerBox = pointer.getBoundingClientRect();
-        pointerY = pickerPosition(yPosPicker, canvasBox.height-1, (pointerBox.height/2));
-        pointerX = pickerPosition(xPosPicker, canvasBox.width-1, (pointerBox.width/2));
+        let pointerY = pickerPosition(yPosPicker, canvasBox.height-1, (pointerBox.height/2));
+        let pointerX = pickerPosition(xPosPicker, canvasBox.width-1, (pointerBox.width/2));
         pointer.setAttribute("style", `top: ${pointerY}px; left: ${pointerX}px`);
         setColorToPicker();
     }
@@ -252,8 +286,31 @@ function drawPalette(){
     // Add colours
     palette.forEach((color, i) => {
         let box = document.createElement('div');
-        box.setAttribute('class','smallBox')
+        box.setAttribute('class','smallBox smallBoxActive')
+        box.setAttribute('tabindex','0')
         box.setAttribute('style',`background-color: rgb(${color.r}, ${color.g}, ${color.b})`)
+        box.setAttribute('data-value', i)
+        // Set currentColour to this color
+        box.addEventListener('click',(e) => {
+            e.target.focus()
+            // console.log(color)
+            // console.log(color.r, color.g, color.b)
+            setColorToPicker(color)
+        })
+
+        box.addEventListener('focus',(e) => {
+            deleteColour.setAttribute("class","iconButton");
+            values.activeColor = i;
+            console.log(values.activeColor);
+
+        })
+
+        box.addEventListener('blur',(e) => {
+            deleteColour.setAttribute("class","iconButton iconButtonInactive")
+            values.activeColor = undefined;
+            console.log(values.activeColor);
+        })
+
         if(i<6) {
             boxRow0.appendChild(box)
         } else {
@@ -287,7 +344,7 @@ function loadPalette(){
 
     }
     if(window && window.localStorage && window.localStorage.getItem('palette')){
-        storage = JSON.parse(window.localStorage.getItem('palette'))
+        let storage = JSON.parse(window.localStorage.getItem('palette'))
         palette = [...storage]
     }
 }
