@@ -1,0 +1,198 @@
+/* Global Styles */
+
+* {
+    font-family: "Noto Sans", "Segoe UI", Tahoma, Verdana, sans-serif;
+    color: #aaa;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+p, span {
+    font-family: "Noto Sans", Arial, "Segoe UI", Tahoma, Verdana, sans-serif;
+    font-size: 14px;
+}
+p {
+    line-height: 10px;
+}
+
+/* Specific IDs */
+#slider {
+    position: absolute; 
+    top: -7px; 
+    height: 18px; 
+    width: 24px;
+    margin-left: 4px;
+    left: 0px;
+    filter: drop-shadow(1px 1px 3px rgba(0,0,0,0.4))
+}
+#pointer {
+    position: absolute;
+    left: 242.5px;
+    width: 5px;
+    height: 5px;
+    border: 4px solid black;
+    border-radius: 50%;
+}
+#subPointer {
+    position: absolute;
+    left: -2px;
+    top: -2px;
+    width: 5px;
+    height: 5px;
+    border: 2px solid white;
+    border-radius: 50%;
+}
+#currentColour {
+    box-sizing: border-box;
+    height: 36px;
+    width: 36px;
+    margin-left: 5px;
+    margin-right: 15px;
+    display: inline-block;
+    border: #fff solid 1px;
+    border-radius: 4px;
+    align-self: center;
+}
+#mainWrapper {
+    background-color: #000;
+    width: 272px;
+}
+#hexText {
+    letter-spacing: 0.1ch;
+}
+
+
+/* Specific Classes */
+
+.colourOptionsPanel {
+    width: 80px;
+}
+.colourType {
+    display: inline-block;
+    width: 40px;
+    text-align: end;
+}
+.uiRow {
+    padding: 16px 16px;
+    height: 54px;
+}
+.uiRow:first-of-type {
+    padding-bottom: 12px;
+}
+.uiRow:last-of-type {
+    padding-top: 0px;
+    border-top: solid #434343 1px;
+}
+.textField {
+    box-sizing: border-box;
+    width: 112px;
+    height: 24px;
+    border: #434343 solid 1px;
+    border-radius: 12px;
+    padding-left: 8px;
+    padding-top: 1px;
+}
+.colourValueRow {
+    display: block;
+}
+.colourValueRow:first-child {
+    display: block;
+    margin-bottom: 6px;
+}
+.iconButton {
+    box-sizing: border-box;
+    width: 24px;
+    height: 24px;
+    border: #434343 solid 1px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.iconButton:hover {
+    background-color: #434343;
+    border-color: #aaa;
+    cursor: pointer;
+}
+.iconButton svg {
+    stroke: #aaa;
+}
+.iconButton:hover svg {
+    stroke: #fff;
+}
+.iconButtonInactive svg {
+    stroke: #434343 !important;
+}
+.iconButtonInactive:hover {
+    border: #434343 solid 1px;
+    background-color: #000;
+}
+.smallBox {
+    display: inline-block;
+    box-sizing: border-box;
+    width: 16px;
+    height: 16px;
+    border: #434343 solid 1px;
+    border-radius: 4px;
+    margin-top: 8px;
+    margin-left: 8px;
+}
+.smallBox:hover {
+    border-color: #aaa;
+    cursor: pointer;
+    stroke: #fff;
+}
+.smallBoxActive {
+    border-color: #666;
+}
+.smallBoxActive:hover {
+    border-color: #ccc;
+}
+.paletteOptions .iconButton {
+    margin-right: 4px;
+}
+.paletteOptions .iconButton:last-of-type {
+    margin-right: 0px;
+}
+.paletteColours {
+    width: 155px;
+    display: flex;
+    flex-direction: column;
+}
+.buttonRow {
+    box-sizing: border-box;
+    display: flex;
+    padding: 0px;
+    height: 24px;
+    margin-top: 8px;
+}
+.buttonColumn > div:last-child {
+    margin-top: 4px;
+}
+
+/* Generic Classes */
+
+.block {
+    display: block;
+}
+.inlineBlock {
+    display: inline-block;
+}
+.flex {
+    display: flex;
+}
+.row {
+    flex-direction: row;
+}
+.column {
+    flex-direction: column;
+}
+.tight {
+    letter-spacing: -0.5px;
+}
+.end {
+    align-self: flex-end;
+}

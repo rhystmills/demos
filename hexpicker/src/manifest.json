@@ -1,0 +1,14 @@
+{
+    "name": "My Extension",
+    "version": "1.0",
+    "description": "My extension that does things",
+    "manifest_version": 2,
+    "browser_action": {
+        "default_popup": "index.html"
+    },
+    "content_scripts": [{
+        "css": ["main.css"],
+        "js": ["index.js"],
+        "matches": ["*"]
+    }]
+}
